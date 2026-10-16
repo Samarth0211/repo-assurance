@@ -96,6 +96,44 @@ test('external declarations are explicit and can be forbidden by a policy', t =>
   const report = scan({ root }); assert.equal(report.result, 'FAIL'); assert.equal(report.diagnostics.length, 0);
 });
 
+test('relative asset specifiers match externals patterns as documented', t => {
+  // docs/configuration.md offers `import './theme.css'` with `["**/*.css"]`.
+  // minimatch treats `/` as a separator, so the leading `./` and `../` segments
+  // stop both `**/*.css` and `*.css` matching, and every relative asset import
+  // became UNRESOLVED_IMPORT with no indication the pattern was at fault.
+  const root = fixture(t, {
+    'src/app.ts': 'import "./theme.css";',
+    'src/ui/panel.ts': 'import "../theme.css";',
+    'src/ui/deep/widget.ts': 'import "../../theme.css";'
+  });
+  config(root, { externals: ['**/*.css'] });
+  const report = scan({ root });
+  assert.equal(report.diagnostics.length, 0);
+  assert.equal(report.result, 'PASS');
+  assert.equal(report.edges.filter(e => e.resolution === 'external').length, 3);
+});
+
+test('externals still match bare and scoped specifiers exactly', t => {
+  // The relative-segment fallback must not widen matching for package names.
+  const root = fixture(t, {
+    'src/a.ts': 'import "theme.css"; import "@scope/pkg"; import "left-pad";'
+  });
+  config(root, { externals: ['*.css', '@scope/*', 'left-pad'] });
+  const report = scan({ root });
+  assert.equal(report.diagnostics.length, 0);
+  assert.equal(report.edges.filter(e => e.resolution === 'external').length, 3);
+});
+
+test('a specifier escaping the pattern is not silently treated as external', t => {
+  // `../` normalisation must not let an unrelated specifier match a narrow
+  // pattern: only the leading relative segments are removed, nothing else.
+  const root = fixture(t, { 'src/a.ts': 'import "../vendor/theme.css";' });
+  config(root, { externals: ['theme.css'] });
+  const report = scan({ root });
+  assert.ok(report.diagnostics.some(d => d.code === 'UNRESOLVED_IMPORT'));
+  assert.equal(report.result, 'INCONCLUSIVE');
+});
+
 test('syntax errors prevent a successful gate', t => {
   const root = fixture(t, { 'a.ts': 'export const =' }); config(root);
   assert.ok(scan({ root }).diagnostics.some(d => d.code === 'SYNTAX_ERROR'));

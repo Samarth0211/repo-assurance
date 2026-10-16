@@ -11,6 +11,23 @@ import type { Diagnostic, SourceFile } from './types.js';
 export const SOURCE_PATTERN = /\.(?:[cm]?[jt]s|[jt]sx)$/i;
 export const matches = (file: string, patterns: string[]): boolean => patterns.some(pattern => minimatch(file, pattern, { dot: true, nocomment: true, nonegate: true }));
 
+// Module specifiers are not repository paths, so `matches` alone is the wrong
+// tool for `externals`. minimatch treats `/` as a separator, which means
+// neither `*.css` nor `**/*.css` matches `./theme.css` or `../ui/theme.css`:
+// the leading `.` and `..` segments are path components that no `*` consumes.
+// Users then follow the documented `["**/*.css"]` example, see it silently fail
+// on every relative import, and have no diagnostic explaining why.
+//
+// Matching the specifier as written and again with its leading relative
+// segments removed keeps `./theme.css` and `../ui/theme.css` matching
+// `**/*.css` and `*.css`, while bare specifiers such as `react` and scoped
+// `@scope/pkg` continue to match exactly as before.
+export function matchesSpecifier(specifier: string, patterns: string[]): boolean {
+  if (matches(specifier, patterns)) return true;
+  const bare = specifier.replace(/^(?:\.{1,2}\/)+/, '');
+  return bare !== specifier && matches(bare, patterns);
+}
+
 export function inventory(root: string, config: Config): { paths: string[]; diagnostics: Diagnostic[] } {
   const diagnostics: Diagnostic[] = [];
   let candidates: string[];

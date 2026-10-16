@@ -3,7 +3,7 @@ import path from 'node:path';
 import { isBuiltin } from 'node:module';
 import ts from 'typescript';
 import type { Config } from '../core/config.js';
-import { matches } from '../core/discovery.js';
+import { matchesSpecifier } from '../core/discovery.js';
 import type { TrackedIO } from '../core/io.js';
 import { inside, relative } from '../core/paths.js';
 import type { Diagnostic, Edge, SourceFile } from '../core/types.js';
@@ -70,7 +70,7 @@ export function analyzeTypeScript(root: string, files: SourceFile[], config: Con
       const specifier = literal.text;
       const pos = source.getLineAndCharacterOfPosition(node.getStart(source));
       const location = { from: file.path, specifier, line: pos.line + 1, column: pos.character + 1, kind };
-      if (isBuiltin(specifier) || matches(specifier, config.externals)) {
+      if (isBuiltin(specifier) || matchesSpecifier(specifier, config.externals)) {
         edges.push({ ...location, to: `external:${specifier}`, resolution: 'external' });
         return;
       }

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+Fixed:
+
+- `externals` patterns now match relative specifiers. `minimatch` treats `/` as a
+  path separator, so neither `*.css` nor the documented `**/*.css` matched
+  `./theme.css` or `../ui/theme.css`, and every relative asset import was
+  reported as `UNRESOLVED_IMPORT` with nothing indicating the pattern was at
+  fault. Specifiers are now matched as written and again with leading `./` and
+  `../` segments removed. Bare and scoped package specifiers are unaffected.
+
 ## 0.1.0-alpha.1 — 2026-10-16
 
 Initial working alpha:
