@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "mode": "observe",
+  "include": ["src/**"],
+  "rules": {
+    "boundaries": [{
+      "id": "ui-must-use-service",
+      "from": ["src/ui/**"],
+      "disallow": ["src/storage/**"],
+      "message": "The UI must use the service interface instead of importing storage directly.",
+      "severity": "error"
+    }],
+    "cycles": { "enabled": true, "severity": "error" }
+  }
+}

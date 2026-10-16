@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "mode": {
+      "default": "observe",
+      "type": "string",
+      "enum": [
+        "observe",
+        "enforce"
+      ]
+    },
+    "include": {
+      "default": [
+        "**/*"
+      ],
+      "minItems": 1,
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "exclude": {
+      "default": [
+        "**/dist/**",
+        "**/build/**",
+        "**/coverage/**",
+        "**/.next/**"
+      ],
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "externals": {
+      "default": [],
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "analysis": {
+      "default": {
+        "maxFiles": 50000,
+        "maxFileBytes": 2000000
+      },
+      "type": "object",
+      "properties": {
+        "maxFiles": {
+          "default": 50000,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "maxFileBytes": {
+          "default": 2000000,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000000
+        }
+      },
+      "additionalProperties": false
+    },
+    "rules": {
+      "default": {
+        "boundaries": [],
+        "cycles": {
+          "enabled": true,
+          "severity": "warning",
+          "includeTypeOnly": false
+        }
+      },
+      "type": "object",
+      "properties": {
+        "boundaries": {
+          "default": [],
+          "maxItems": 200,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_.-]{0,79}$"
+              },
+              "from": {
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "disallow": {
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "severity": {
+                "default": "error",
+                "type": "string",
+                "enum": [
+                  "error",
+                  "warning"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "maxLength": 1000
+              }
+            },
+            "required": [
+              "id",
+              "from",
+              "disallow"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "cycles": {
+          "default": {
+            "enabled": true,
+            "severity": "warning",
+            "includeTypeOnly": false
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "severity": {
+              "default": "warning",
+              "type": "string",
+              "enum": [
+                "error",
+                "warning"
+              ]
+            },
+            "includeTypeOnly": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "additionalProperties": false
+}

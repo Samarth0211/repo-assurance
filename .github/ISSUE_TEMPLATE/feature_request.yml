@@ -1,0 +1,17 @@
+name: Capability request
+description: Propose a specific analysis or workflow improvement.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Concrete problem
+      description: Which behavior or engineering rule cannot be checked today?
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples and expected evidence
+      description: Describe safe, violating, and ambiguous cases.
+    validations:
+      required: true

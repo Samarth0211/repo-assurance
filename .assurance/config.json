@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "mode": "enforce",
+  "include": ["src/**"],
+  "exclude": [],
+  "rules": {
+    "boundaries": [
+      {
+        "id": "core-foundations-stay-independent",
+        "from": ["src/core/{types,hash,paths,git,config,io,discovery}.ts"],
+        "disallow": ["src/analyzers/**", "src/policies/**", "src/reporters/**", "src/cli.ts"],
+        "severity": "error"
+      },
+      {
+        "id": "analysis-does-not-depend-on-presentation",
+        "from": ["src/core/**", "src/analyzers/**", "src/policies/**"],
+        "disallow": ["src/reporters/**", "src/cli.ts"],
+        "severity": "error"
+      }
+    ],
+    "cycles": { "enabled": true, "severity": "error", "includeTypeOnly": true }
+  }
+}

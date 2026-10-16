@@ -1,0 +1,59 @@
+{
+  "name": "@samarth0211/repo-assurance",
+  "version": "0.1.0-alpha.1",
+  "description": "Local, evidence-backed architecture checks for TypeScript and JavaScript repositories.",
+  "type": "module",
+  "license": "MIT",
+  "author": "samarth0211",
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "bin": {
+    "repo-assurance": "dist/src/cli.js"
+  },
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "files": [
+    "dist/src",
+    "schemas",
+    "docs",
+    "LICENSE",
+    "*.md"
+  ],
+  "scripts": {
+    "setup": "npm ci --ignore-scripts && npm run build",
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/test/all.test.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "schemas": "npm run build && node scripts/schemas.mjs",
+    "check": "npm test && node dist/src/cli.js check && npm run docs:check",
+    "docs:check": "node scripts/check-docs.mjs",
+    "test:package": "node scripts/package-smoke.mjs",
+    "demo": "npm run build && node dist/src/cli.js scan --root examples/boundary-demo",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samarth0211/repo-assurance.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samarth0211/repo-assurance/issues"
+  },
+  "keywords": [
+    "architecture",
+    "static-analysis",
+    "typescript",
+    "code-quality",
+    "monorepo",
+    "ci"
+  ],
+  "dependencies": {
+    "minimatch": "10.2.6",
+    "typescript": "6.0.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5"
+  }
+}

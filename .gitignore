@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+.assurance-cache/
+*.tgz
+*.tsbuildinfo
+reports/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db

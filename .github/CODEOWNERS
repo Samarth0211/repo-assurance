@@ -1,0 +1,7 @@
+# Review ownership complements required-review settings; this file alone does not enforce them.
+* @samarth0211
+/.assurance/ @samarth0211
+/.github/ @samarth0211
+/src/core/config.ts @samarth0211
+/src/core/scan.ts @samarth0211
+/LICENSE @samarth0211

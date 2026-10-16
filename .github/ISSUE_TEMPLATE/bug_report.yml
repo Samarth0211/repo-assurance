@@ -1,0 +1,25 @@
+name: Bug report
+description: Report incorrect analysis or a setup problem using a minimal reproduction.
+body:
+  - type: markdown
+    attributes:
+      value: Do not include secrets or proprietary source. Use the security reporting process for exploitable vulnerabilities.
+  - type: input
+    id: version
+    attributes:
+      label: Tool, Node, and OS versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction and command
+      description: Include a small source example and redacted policy.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
