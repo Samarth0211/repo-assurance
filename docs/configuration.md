@@ -52,7 +52,7 @@ This does not invoke `tsc --build` or promise solution-wide project-reference se
 
 ## Deliberate externals
 
-An asset import such as `import './theme.css'` may require `"externals": ["**/*.css"]`. This explicitly models the import as an opaque external dependency. Do not add `"**"` just to suppress unresolved imports; it would remove the internal graph you intended to analyze. Treat external declarations and exclusions as reviewable policy changes.
+An asset import such as `import './theme.css'` may require `"externals": ["**/*.css"]`. This explicitly models the import as an opaque external dependency. Patterns are matched against the specifier as written and against the specifier with its leading `./` and `../` segments removed, so `**/*.css` covers `./theme.css` and `../ui/theme.css` as well as `ui/theme.css`. Bare and scoped package specifiers are matched exactly as written. Do not add `"**"` just to suppress unresolved imports; it would remove the internal graph you intended to analyze. Treat external declarations and exclusions as reviewable policy changes.
 
 ## Observation versus enforcement
 
