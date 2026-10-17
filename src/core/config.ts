@@ -19,7 +19,7 @@ export const configSchema = z.strictObject({
   analysis: z.strictObject({
     maxFiles: z.number().int().min(1).max(1_000_000).default(50_000),
     maxFileBytes: z.number().int().min(1).max(20_000_000).default(2_000_000)
-  }).default({ maxFiles: 50_000, maxFileBytes: 2_000_000 }),
+  }).default(() => ({ maxFiles: 50_000, maxFileBytes: 2_000_000 })),
   rules: z.strictObject({
     boundaries: z.array(z.strictObject({
       id: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_.-]{0,79}$/),
@@ -32,8 +32,8 @@ export const configSchema = z.strictObject({
       enabled: z.boolean().default(true),
       severity: severity.default('warning'),
       includeTypeOnly: z.boolean().default(false)
-    }).default({ enabled: true, severity: 'warning', includeTypeOnly: false })
-  }).default({ boundaries: [], cycles: { enabled: true, severity: 'warning', includeTypeOnly: false } })
+    }).default(() => ({ enabled: true, severity: 'warning' as const, includeTypeOnly: false }))
+  }).default(() => ({ boundaries: [], cycles: { enabled: true, severity: 'warning' as const, includeTypeOnly: false } }))
 });
 export type Config = z.infer<typeof configSchema>;
 

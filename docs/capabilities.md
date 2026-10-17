@@ -1,10 +1,13 @@
 # Capabilities and limitations
 
-This document describes `0.1.0-alpha.1`, not the complete planned platform.
+This document describes `0.1.0-alpha.2`, not the complete planned platform.
 
 | Capability | Status | Boundary |
 |---|---|---|
 | Local CLI and programmatic API | Implemented | Node.js 22.14+ |
+| Guided terminal setup | Implemented | JS/TS detection, reviewed suggestions, first scan; existing files preserved |
+| GitHub pilot generation | Implemented | Separate pinned analyzer; owner must configure trusted enforcement |
+| Browser setup UI | Not implemented | Use the terminal wizard |
 | TS/JS source discovery | Implemented | Supported suffixes and explicit scope |
 | Compiler-aware module resolution | Implemented | TypeScript 6.0.3 API and supported configuration |
 | Static imports/reexports/import-equals | Implemented | Literal specifiers |

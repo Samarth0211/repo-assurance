@@ -6,6 +6,10 @@ This release is a CLI process and its installed package dependencies. It has no 
 
 A company can install a reviewed package in its own build image and keep source inside its existing infrastructure. Resolve dependencies through an approved registry/mirror. No paid service is required by the analyzer.
 
+For interactive onboarding, run `setup` and start with observation. The wizard
+creates a reviewed configuration, next-step notes, and optionally a GitHub pilot.
+It preserves existing policy and does not configure organization authorization.
+
 ## Pilot procedure
 
 1. Choose an owner and a repository with a reproducible development environment.
@@ -37,7 +41,7 @@ Commit reviewed `.assurance` configuration/baselines to the application reposito
 
 ## Removal
 
-Remove the required hosting check through the organization's normal change process, remove the invocation from CI, and remove the tool package/checkout if no longer needed. Archive or remove `.assurance` files deliberately. Delete report artifacts according to company policy. The CLI never installs an agent into the target application.
+Remove the required hosting check through the organization's normal change process, remove the invocation from CI (including a wizard-generated `.github/workflows/repo-assurance.yml` if present), and remove the tool package/checkout if no longer needed. Archive or remove `.assurance` files deliberately. Delete report artifacts according to company policy. The CLI never installs an agent into the target application.
 
 ## Support expectations
 

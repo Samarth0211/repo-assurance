@@ -20,7 +20,17 @@ node dist/src/cli.js check --root examples/boundary-demo
 
 Exit code 1 is expected. The example is deliberately a failing fixture, not a setup failure.
 
+## Recommended: guided onboarding
+
+After installing the tool, run `npm run onboard`. Enter your project folder and
+follow the prompts to review scope, suggested boundaries, observation/enforcement,
+and optional GitHub help. Setup previews files, preserves existing configuration,
+and runs a first scan. It prints the next commands and writes `.assurance/SETUP.md`.
+See the [wizard walkthrough](guided-setup.md) for the complete flow.
+
 ## Add an existing project
+
+Use this manual path if you prefer editing configuration directly.
 
 1. Install that project's dependencies using its normal trusted procedure. Repo Assurance does not install them for you.
 2. Run `init --root <project>`. Review include/exclude patterns and keep the initial observation mode.

@@ -1,4 +1,4 @@
-export const VERSION = '0.1.0-alpha.1';
+export const VERSION = '0.1.0-alpha.2';
 
 export type Severity = 'error' | 'warning';
 export type Diagnostic = { code: string; message: string; path?: string };

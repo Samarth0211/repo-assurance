@@ -1,6 +1,6 @@
 {
   "name": "@samarth0211/repo-assurance",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "Local, evidence-backed architecture checks for TypeScript and JavaScript repositories.",
   "type": "module",
   "license": "MIT",
@@ -23,8 +23,9 @@
   ],
   "scripts": {
     "setup": "npm ci --ignore-scripts && npm run build",
+    "onboard": "node dist/src/cli.js setup",
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/test/all.test.js",
+    "test": "npm run build && node --test dist/test/all.test.js dist/test/setup.test.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "schemas": "npm run build && node scripts/schemas.mjs",
     "check": "npm test && node dist/src/cli.js check && npm run docs:check",

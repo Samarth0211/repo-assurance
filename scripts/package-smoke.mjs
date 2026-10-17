@@ -28,7 +28,15 @@ try {
   assert.match(demo.stdout, /ui-must-use-service/);
   const api = await import(pathToFileURL(path.join(packageRoot, 'dist/src/index.js')).href);
   assert.equal(typeof api.scan, 'function');
-  process.stdout.write(`Packed and installed ${artifact.filename}; CLI, API, license and expected failing demo verified (${artifact.files.length} packaged files).\n`);
+  const project = path.join(temp, 'onboarding-target');
+  fs.mkdirSync(project);
+  fs.writeFileSync(path.join(project, 'hello.ts'), 'export const hello = 1;\n');
+  const setup = spawnSync(process.execPath, [cli, 'setup', '--root', project, '--yes', '--github'], { encoding: 'utf8', timeout: 30_000 });
+  assert.equal(setup.status, 0, setup.stderr || setup.stdout);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(project, '.assurance/config.json'), 'utf8')).mode, 'observe');
+  assert.ok(fs.existsSync(path.join(project, '.github/workflows/repo-assurance.yml')));
+  assert.ok(fs.existsSync(path.join(project, '.assurance/SETUP.md')));
+  process.stdout.write(`Packed and installed ${artifact.filename}; CLI, API, license, guided setup and expected failing demo verified (${artifact.files.length} packaged files).\n`);
 } finally {
   const resolved = fs.realpathSync(temp);
   assert.equal(path.dirname(resolved), fs.realpathSync(os.tmpdir()));

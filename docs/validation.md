@@ -1,17 +1,18 @@
 # Validation record
 
-Release candidate: `0.1.0-alpha.1`.
+Release candidate: `0.1.0-alpha.2`.
 
-Local validation completed across 16–17 October 2026 with Windows and Node.js 22.19.0:
+Local validation completed on 17 October 2026 with Windows and Node.js 22.19.0:
 
 | Check | Recorded result |
 |---|---|
-| `npm test` | 32 tests passed; no failures or skipped cases |
+| `npm test` | 54 tests passed; no failures or skipped cases |
 | Project architecture check | Passed against the configured source boundaries and cycle rule |
-| `npm run docs:check` | Local links verified in 19 Markdown documents |
-| `npm run test:package` | Tarball built and installed in an isolated temporary prefix; CLI, API, license, and expected failing demo verified |
-| `npm audit` | No known vulnerabilities reported for the installed dependency inventory at the time checked |
-| Generated configuration/baseline schemas | Generated successfully from runtime schemas |
+| `npm run docs:check` | Local links verified in 20 Markdown documents |
+| `npm run test:package` | Tarball built and installed in an isolated temporary prefix; CLI, API, license, guided setup, and expected failing demo verified |
+| Dependency inventory | Unchanged from alpha.1, whose recorded npm audit reported no known vulnerabilities at the time checked |
+| Generated configuration/baseline schemas | Regenerated successfully; no schema changes |
+| Generated GitHub pilot | Parsed as YAML locally; triggers, permissions, and scan command verified; trust invariants covered by tests |
 
 The hosted CI matrix covers Windows/Linux and Node 22/24. Consult the [workflow run for the chosen commit](https://github.com/samarth0211/repo-assurance/actions/workflows/ci.yml) for its actual status; a local result does not imply every hosted job has passed.
 
@@ -26,6 +27,11 @@ The hosted CI matrix covers Windows/Linux and Node 22/24. Consult the [workflow 
 - A stale branch after ten intervening commits, then validation after integration.
 - Candidate policy weakening, dirty checkout, and untracked source.
 - CLI initialization, output safety, and SARIF evidence.
+- Interactive and unattended onboarding, real piped CLI input, cancellation, and invalid-choice recovery.
+- Observation/enforcement choices, scope selection, and explicit acceptance/rejection of suggested boundaries.
+- Repeat setup preserving existing policy, baseline, workflow, and notes.
+- Incomplete first scans, orphan baselines, redirected paths, and concurrent file/configuration changes.
+- Configuration defaults isolated across setup sessions; installed-package onboarding.
 
 ## Qualification not yet completed
 

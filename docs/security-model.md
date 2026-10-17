@@ -2,7 +2,7 @@
 
 ## Data flow
 
-The CLI reads local source, Git metadata, policy, baseline, and compiler/package files needed for module resolution. It keeps an in-memory graph and writes only explicitly requested reports or configuration/baseline changes. Analysis has no network calls, model calls, telemetry, or source-upload service.
+The CLI reads local source, Git metadata, policy, baseline, and compiler/package files needed for module resolution. It keeps an in-memory graph and writes only explicitly requested reports, configuration/baseline changes, or setup helpers. The setup wizard can create a guide and an optional GitHub workflow after preview/confirmation (or explicit unattended setup). Analysis has no network calls, model calls, telemetry, or source-upload service.
 
 Dependency installation uses npm and needs registry access. The resolver can consult referenced configuration and package files outside the source inclusion patterns. Inclusion patterns define the analyzed source scope, not a filesystem sandbox.
 
@@ -34,6 +34,8 @@ Node.js, the compiler, Git, and parsers remain part of the trusted computing bas
 - Trusted-base policy evaluation and candidate identity binding.
 - Baseline fingerprint matching, policy compatibility, and resolved-exemption retirement.
 - Refusal to overwrite existing configuration and unrelated report targets.
+- Setup preflights all planned files, rejects symlinked output paths, preserves existing files, and uses exclusive file creation. Cancellation before save creates nothing. Setup is not a filesystem transaction or a defense against hostile concurrent filesystem mutation.
+- GitHub pilot generation does not change hosting settings or confer merge authority; its analyzer is pinned and checked out separately from the target.
 
 The implementation has not received an independent security audit. Local hardening does not substitute for sandboxing in a shared service.
 
