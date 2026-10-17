@@ -2,11 +2,11 @@
 
 Release candidate: `0.1.0-alpha.1`.
 
-Local validation completed on 16 October 2026 with Windows and Node.js 22.19.0:
+Local validation completed across 16–17 October 2026 with Windows and Node.js 22.19.0:
 
 | Check | Recorded result |
 |---|---|
-| `npm test` | 30 tests passed; no failures or skipped cases |
+| `npm test` | 32 tests passed; no failures or skipped cases |
 | Project architecture check | Passed against the configured source boundaries and cycle rule |
 | `npm run docs:check` | Local links verified in 19 Markdown documents |
 | `npm run test:package` | Tarball built and installed in an isolated temporary prefix; CLI, API, license, and expected failing demo verified |

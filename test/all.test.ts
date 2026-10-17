@@ -276,3 +276,25 @@ test('Git filesystem monitor configuration cannot execute during analysis', t =>
   git(root, ['config', 'core.fsmonitor', 'an-untrusted-command-that-must-not-run']);
   assert.equal(scan({ root }).result, 'PASS');
 });
+
+test('policy formatting changes do not masquerade as semantic policy changes', t => {
+  const root = fixture(t, { 'src/a.ts': 'export const a=1;' }); repository(root);
+  const base = git(root, ['rev-parse', 'HEAD']).trim();
+  const policy = JSON.parse(fs.readFileSync(path.join(root, '.assurance/config.json'), 'utf8'));
+  write(root, '.assurance/config.json', JSON.stringify(policy, null, 2).replaceAll('\n', '\r\n'));
+  commit(root, 'format policy');
+  const report = scan({ root, base, enforce: true });
+  assert.equal(report.result, 'PASS');
+});
+
+test('import casing cannot bypass a boundary on a case-insensitive filesystem', t => {
+  const root = fixture(t, { ...badFiles, 'src/ui/page.ts': 'import { value } from "../DB/store.js";' }); config(root);
+  const report = scan({ root });
+  if (fs.existsSync(path.join(root, 'src/DB/store.ts'))) {
+    assert.equal(report.result, 'FAIL');
+    assert.equal(report.findings[0]?.ruleId, 'layer');
+  } else {
+    assert.equal(report.result, 'INCONCLUSIVE');
+    assert.ok(report.diagnostics.some(d => d.code === 'UNRESOLVED_IMPORT'));
+  }
+});

@@ -18,7 +18,7 @@ export function analyzeTypeScript(root: string, files: SourceFile[], config: Con
     fileExists: io.fileExists,
     readFile: io.read,
     directoryExists: io.directoryExists,
-    realpath: p => { try { return fs.realpathSync(p); } catch { return p; } },
+    realpath: p => { try { return fs.realpathSync.native(p); } catch { return p; } },
     getCurrentDirectory: () => root,
     useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames
   };
@@ -80,7 +80,9 @@ export function analyzeTypeScript(root: string, files: SourceFile[], config: Con
         diagnostics.push({ code: 'UNRESOLVED_IMPORT', path: file.path, message: `Cannot resolve ${JSON.stringify(specifier)}. Install the repository's dependencies, correct its compiler configuration, or explicitly declare an external module.` });
         return;
       }
-      const target = path.resolve(resolved.resolvedFileName);
+      // Canonical disk paths prevent Windows casing or symlink aliases from
+      // bypassing policies written against actual repository paths.
+      const target = fs.realpathSync.native(resolved.resolvedFileName);
       const rel = relative(root, target);
       if (resolved.isExternalLibraryImport || !inside(root, target) || rel.split('/').includes('node_modules')) {
         // Workspace aliases resolved by TS into actual source are internal even

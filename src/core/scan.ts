@@ -13,7 +13,7 @@ import { VERSION, type Diagnostic, type Report } from './types.js';
 export type ScanOptions = { root?: string; enforce?: boolean; base?: string; skipBaseline?: boolean };
 
 export function scan(options: ScanOptions = {}): Report {
-  const root = fs.realpathSync(options.root ?? process.cwd());
+  const root = fs.realpathSync.native(options.root ?? process.cwd());
   if (!fs.statSync(root).isDirectory()) throw new Error('Repository root must be a directory.');
   const io = new TrackedIO(root);
   const diagnostics: Diagnostic[] = [];
@@ -31,13 +31,16 @@ export function scan(options: ScanOptions = {}): Report {
   if (mode === 'enforce' && !config.rules.boundaries.some(r => r.severity === 'error') && !(config.rules.cycles.enabled && config.rules.cycles.severity === 'error')) diagnostics.push({ code: 'NO_BLOCKING_RULES', message: 'No error-level rule is configured. Configure an explicit boundary or error-level cycle rule before enforcement.' });
 
   if (base) {
-    const top = fs.realpathSync(git(root, ['rev-parse', '--show-toplevel']).trim());
-    if (top !== root) throw new Error('--base requires the Git repository root, not a subdirectory.');
+    const top = fs.realpathSync.native(git(root, ['rev-parse', '--show-toplevel']).trim());
+    if (path.relative(top, root) !== '') throw new Error('--base requires the Git repository root, not a subdirectory.');
     if (!startGit.head) throw new Error('--base requires a committed Git checkout.');
     if (startGit.dirty) diagnostics.push({ code: 'DIRTY_CANDIDATE', message: 'A base-aware check requires a clean committed candidate.' });
     try { git(root, ['merge-base', '--is-ancestor', base, startGit.head]); }
     catch { diagnostics.push({ code: 'STALE_BASE', message: 'The candidate does not contain the selected base. Update the branch or analyze the integration candidate.' }); }
-    if (localConfig !== configText || localBaseline !== (options.skipBaseline ? localBaseline : baselineText)) diagnostics.push({ code: 'PROTECTED_POLICY_CHANGE', message: 'This candidate changes protected policy/baseline files. Current checks use the base policy; a separate authorized policy-update process is required.' });
+    // Compare validated semantics, not checkout-specific newlines or formatting.
+    const sameConfig = digest(localConfig === undefined ? undefined : parseConfig(localConfig)) === digest(configText === undefined ? undefined : config);
+    const sameBaseline = options.skipBaseline || digest(localBaseline === undefined ? undefined : parseBaseline(localBaseline)) === digest(baselineText === undefined ? undefined : parseBaseline(baselineText));
+    if (!sameConfig || !sameBaseline) diagnostics.push({ code: 'PROTECTED_POLICY_CHANGE', message: 'This candidate changes protected policy/baseline files. Current checks use the base policy; a separate authorized policy-update process is required.' });
   }
 
   for (const file of ['package.json', 'package-lock.json', 'npm-shrinkwrap.json', 'pnpm-lock.yaml', 'yarn.lock', '.pnp.cjs']) io.read(path.join(root, file));
