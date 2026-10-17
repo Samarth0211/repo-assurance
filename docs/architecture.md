@@ -16,6 +16,12 @@ CLI
 
 `src/core` contains schemas, source inventory, hashes, Git access, and orchestration. `src/analyzers` extracts language facts. `src/policies` evaluates facts without presentation dependencies. `src/reporters` renders outcomes. The package's own `.assurance/config.json` checks this dependency direction.
 
+`src/setup` owns interactive prompts, folder-based suggestions, safe output planning,
+the GitHub pilot template, and first-report guidance. It calls the same scanner as
+the CLI and adds no alternate analysis or baseline acceptance path. Core analysis
+does not depend on onboarding. Configuration defaults allocate fresh nested objects
+for each parse so setup sessions cannot share mutable rule lists.
+
 The initial release uses modules in one package. Extract packages/services only when there is a concrete lifecycle, performance, or ownership reason. The larger [implementation plan](../IMPLEMENTATION_PLAN.md) remains the design direction, not a list of features already present.
 
 ## Snapshot consistency
@@ -34,7 +40,7 @@ Boundary fingerprints identify a rule and dependency edge. Moving a violation do
 
 ## State
 
-Only explicit baseline/configuration files persist. There is no cross-run incremental cache or remote database. Reports may be stored by the caller. This favors reproducible full-scan behavior until incremental invalidation can be tested against it.
+Only explicit baseline/configuration files and setup helpers persist. There is no cross-run incremental cache or remote database. Reports may be stored by the caller. This favors reproducible full-scan behavior until incremental invalidation can be tested against it.
 
 ## Decisions
 

@@ -10,6 +10,11 @@
 
 Warning findings do not block. A baseline matches individual accepted findings. An INCONCLUSIVE report may also contain verified findings; inspect both. Invalid command/configuration errors are written to stderr with exit 2 when a report cannot be constructed.
 
+The setup wizard returns the first scan's exit code after saving its files. A saved
+configuration does not imply a complete first scan. Cancellation before saving
+returns 130 and creates no setup files. Use `scan --format json` for machine-readable
+output; the wizard's conversational output is for people.
+
 Never convert an exit 2 into success in a mandatory CI gate. SARIF upload success is not the decision; retain the CLI exit code.
 
 ## JSON structure

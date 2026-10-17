@@ -11,6 +11,7 @@ import { defaultConfig, parseConfig, parseBaseline } from '../src/core/config.js
 import { git } from '../src/core/git.js';
 import { components } from '../src/policies/graph.js';
 import { sarifReport } from '../src/reporters/sarif.js';
+import { VERSION } from '../src/core/types.js';
 
 function fixture(t: { after: (fn: () => void) => void }, files: Record<string, string> = {}): string {
   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'repo-assurance-test-')));
@@ -202,7 +203,7 @@ test('CLI initializes safely, runs without a global install, and prints version'
   const root = fixture(t, { 'a.ts': 'export const a=1;' });
   assert.equal(cli(root, ['init']).status, 0);
   assert.equal(cli(root, ['init']).status, 2);
-  assert.match(cli(root, ['--version']).stdout, /^0\.1\.0-alpha\.1\s*$/);
+  assert.equal(cli(root, ['--version']).stdout.trim(), VERSION);
   assert.equal(cli(root, ['scan', '--format', 'json']).status, 0);
   assert.equal(cli(root, ['check']).status, 2);
 });

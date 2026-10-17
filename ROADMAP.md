@@ -10,6 +10,7 @@ The [implementation plan](IMPLEMENTATION_PLAN.md) contains the complete design. 
 - Existing-finding baselines and resolved-exemption retirement.
 - Local trusted-base policy/ancestry checks.
 - Text, JSON, SARIF, setup guides, and tests.
+- Guided terminal onboarding, reviewed folder-based suggestions, first-scan guidance, and optional GitHub pilot generation.
 
 ## Next: reliable adoption
 

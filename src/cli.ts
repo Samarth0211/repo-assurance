@@ -9,12 +9,15 @@ import { scan } from './core/scan.js';
 import { VERSION } from './core/types.js';
 import { textReport } from './reporters/text.js';
 import { sarifReport } from './reporters/sarif.js';
+import { runSetup } from './setup/wizard.js';
+import { SetupCancelled, terminalUI } from './setup/prompts.js';
 
 const HELP = `Repo Assurance ${VERSION}
 
 Usage: repo-assurance <command> [options]
 
 Commands:
+  setup                 Guided setup: choose a project, review rules, run a first scan
   init                  Create reviewable .assurance/config.json (never overwrite)
   scan                  Analyze using the configured observation/enforcement mode
   check                 Require complete analysis and enforce error-level rules
@@ -28,10 +31,12 @@ Options:
   --format <format>     text (default), json, or sarif
   --output <file>       Write the report to a file as well as returning its exit code
   --reason <text>       Why current findings are being accepted in a new baseline
+  --yes                setup only: unattended observation defaults; preserve existing policy
+  --github             setup only: include a GitHub pilot workflow and owner checklist
   --help               Show this help
   --version            Print version
 
-Exit codes: 0 permitted/observation, 1 enforced violation, 2 incomplete/error.
+Exit codes: 0 permitted/observation, 1 enforced violation, 2 incomplete/error, 130 setup cancelled.
 No commands install dependencies, execute repository scripts, or repair source.
 `;
 
@@ -59,12 +64,13 @@ function replaceReport(file: string, text: string): void {
   finally { if (fs.existsSync(temp)) fs.unlinkSync(temp); }
 }
 
-function main(): number {
+async function main(): Promise<number> {
   const args = parseArgs({
     allowPositionals: true, strict: true,
     options: {
       root: { type: 'string' }, base: { type: 'string' }, format: { type: 'string', default: 'text' },
       output: { type: 'string' }, reason: { type: 'string' },
+      yes: { type: 'boolean' }, github: { type: 'boolean' },
       help: { type: 'boolean', short: 'h' }, version: { type: 'boolean', short: 'v' }
     }
   });
@@ -72,8 +78,15 @@ function main(): number {
   if (args.values.help || args.positionals.length === 0) { process.stdout.write(HELP); return 0; }
   const [command, subcommand, ...rest] = args.positionals;
   if (rest.length || (subcommand && command !== 'baseline')) throw new Error('Unexpected positional arguments. Use --help.');
-  if (!['init', 'scan', 'check', 'doctor', 'baseline'].includes(command!)) throw new Error(`Unknown command: ${command}. Use --help.`);
+  if (!['setup', 'init', 'scan', 'check', 'doctor', 'baseline'].includes(command!)) throw new Error(`Unknown command: ${command}. Use --help.`);
   if (!['text', 'json', 'sarif'].includes(args.values.format!)) throw new Error('--format must be text, json, or sarif.');
+  if (command === 'setup') {
+    if (args.values.base || args.values.reason || args.values.output || args.values.format !== 'text') throw new Error('setup supports --root, --yes and --github. Use scan for JSON/SARIF reports.');
+    const ui = args.values.yes ? { write: (text: string) => { process.stdout.write(text); }, ask: async () => { throw new Error('Unexpected prompt in unattended setup.'); }, close() {} } : terminalUI();
+    try { return await runSetup({ root: args.values.root, yes: args.values.yes, github: args.values.github }, ui); }
+    finally { ui.close(); }
+  }
+  if (args.values.yes || args.values.github) throw new Error('--yes and --github are supported only by setup.');
   if (args.values.base && command !== 'check') throw new Error('--base is supported only by check.');
   const root = fs.realpathSync(args.values.root ?? process.cwd());
   if (command === 'init') {
@@ -119,8 +132,8 @@ function main(): number {
   return report.exitCode;
 }
 
-try { process.exitCode = main(); }
+try { process.exitCode = await main(); }
 catch (error) {
   process.stderr.write(`Repo Assurance: ${error instanceof Error ? error.message : String(error)}\n`);
-  process.exitCode = 2;
+  process.exitCode = error instanceof SetupCancelled ? 130 : 2;
 }

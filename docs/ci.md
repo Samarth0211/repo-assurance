@@ -2,6 +2,13 @@
 
 ## A local check is one component of enforcement
 
+`repo-assurance setup` can generate a pilot workflow and an owner checklist. This
+removes workflow boilerplate during evaluation. The template pins a published
+analyzer in a separate checkout, uses read-only permissions, and never installs
+target dependencies. It runs `scan` using candidate policy and is not an authoritative
+merge gate. Use the trust pattern below before turning findings into merge requirements.
+See [guided setup](guided-setup.md) for the generated files and repeat-run behavior.
+
 The repository host must require the check, enforce branch freshness, protect the workflow and policy, and control bypass permissions. Repo Assurance cannot configure or guarantee those properties merely by reading source.
 
 The project's own CI tests its implementation on Linux and Windows. That workflow is not a complete company deployment. In particular, running an analyzer copied from an untrusted PR would let that PR replace the analyzer.

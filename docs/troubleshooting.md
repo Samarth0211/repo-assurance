@@ -3,6 +3,11 @@
 | Symptom / code | What to do |
 |---|---|
 | CLI file missing | Run `npm run setup` from the tool checkout |
+| Unsure how to configure the project | Run `npm run onboard` from the tool checkout |
+| Setup exits 130 | Input ended or setup was cancelled before saving; rerun interactively or explicitly use `--yes` |
+| Setup saved files but exits 2 | The first scan is incomplete; resolve its diagnostics and rerun the printed scan command |
+| Setup keeps old rules or workflow | Existing files are deliberately preserved; review changes through your normal policy process |
+| Setup rejects an output path | Use real directories inside the project; review symlinks or file/directory conflicts |
 | Unsupported Node version | Use Node 22.14+ and reinstall from the lockfile |
 | `CONFIG_REQUIRED` | Run init and review the configuration before enforcing |
 | `NO_BLOCKING_RULES` | Define an error-level boundary or cycle rule |

@@ -4,7 +4,7 @@
 
 Repo Assurance is a local CLI for inspecting TypeScript and JavaScript repositories. It resolves module dependencies, checks architectural boundaries and cycles, and distinguishes existing debt from new violations. Reports include source locations, dependency paths, analysis coverage, and hashes of the inputs used.
 
-**Status: `0.1.0-alpha.1`.** This is the first working component of the [larger platform plan](IMPLEMENTATION_PLAN.md). It is suitable for evaluation and narrowly scoped architecture checks. Million-line performance, automatic repairs, complete dead-code detection, and an organization dashboard are future milestones. See the [capability matrix](docs/capabilities.md) before choosing enforcement rules.
+**Status: `0.1.0-alpha.2`.** This is the first working component of the [larger platform plan](IMPLEMENTATION_PLAN.md). It is suitable for evaluation and narrowly scoped architecture checks. Million-line performance, automatic repairs, complete dead-code detection, and an organization dashboard are future milestones. See the [capability matrix](docs/capabilities.md) before choosing enforcement rules.
 
 ## Quick start
 
@@ -14,19 +14,20 @@ Requirements: **Node.js 22.14 or later** and npm. Git is needed to clone the pro
 git clone https://github.com/samarth0211/repo-assurance.git
 cd repo-assurance
 npm run setup
-npm run demo
+npm run onboard
 ```
 
-The demo intentionally contains one forbidden import. It reports `FAIL` in observation mode and exits successfully so you can inspect the evidence before enabling enforcement.
+The wizard asks for your project folder, detects supported source, helps you review suggested boundaries, and runs your first scan. Start in observation mode to see findings before blocking changes. It can also create a GitHub pilot workflow and an owner checklist. No configuration knowledge is needed to start; you still decide which architecture rules fit your project.
 
-Analyze an existing checkout:
+To select the project directly:
 
 ```sh
-node dist/src/cli.js init --root /path/to/your-repository
-node dist/src/cli.js scan --root /path/to/your-repository
+npm run onboard -- --root /path/to/your-repository
 ```
 
-On Windows, use a quoted path such as `"C:\work\your-repository"`. `init` creates only `.assurance/config.json` and refuses to overwrite an existing configuration. Review its scope and add your project's boundaries before enforcing them.
+On Windows, use a quoted path such as `"C:\work\your-repository"`. Existing configuration, baselines, and workflow files are preserved. See the [wizard walkthrough](docs/guided-setup.md) for choices, unattended setup, and GitHub limits.
+
+For a quick demonstration without onboarding your project, run `npm run demo`. The example intentionally contains one forbidden import. It reports `FAIL` in observation mode and exits successfully so you can inspect the evidence.
 
 ## Define one boundary
 
@@ -59,6 +60,7 @@ node dist/src/cli.js check --root /path/to/your-repository
 
 ## What works today
 
+- Interactive setup with project detection, reviewed rule suggestions, a first report, and optional GitHub pilot generation.
 - TypeScript/JavaScript module resolution using a pinned TypeScript compiler API.
 - Direct dependency boundaries, including type imports and declared external modules.
 - Dependency cycles within included source, with optional type-only cycle detection.
@@ -74,6 +76,7 @@ The tool does not execute your code, install your application's dependencies, re
 
 | Command | Purpose |
 |---|---|
+| `setup` | Guided onboarding and first scan; existing files are kept |
 | `init` | Create a configuration for review |
 | `scan` | Inspect under the configured observation/enforcement mode |
 | `check` | Enforce error-level rules and analysis completeness |
@@ -82,12 +85,13 @@ The tool does not execute your code, install your application's dependencies, re
 | `baseline create --reason "..."` | Explicitly accept specific existing findings |
 | `baseline reconcile` | Retire resolved exemptions without accepting new ones |
 
-All commands accept `--root`. Reports support `--format text|json|sarif` and `--output <file>`. Run `node dist/src/cli.js --help` for usage.
+All commands accept `--root`. `setup --yes` uses unattended observation defaults for a new project; `--github` requests a pilot workflow. Scan/check/doctor reports support `--format text|json|sarif` and `--output <file>`. Run `node dist/src/cli.js --help` for usage.
 
 ## Documentation
 
 | Need | Guide |
 |---|---|
+| Set up interactively without editing JSON | [Guided setup](docs/guided-setup.md) |
 | Install and onboard an existing repository | [Getting started](docs/getting-started.md) |
 | Understand all policy fields and defaults | [Configuration reference](docs/configuration.md) |
 | Read findings, hashes, and exit codes | [Reports and API](docs/reports.md) |
