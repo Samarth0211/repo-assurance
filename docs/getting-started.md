@@ -8,6 +8,10 @@ The npm package is not assumed to be published. All instructions work from a sou
 
 Use quoted absolute paths when repositories have spaces. The tool can inspect a repository outside its own checkout.
 
+Python repositories also need a trusted Python 3.10+ interpreter on PATH. No pip
+packages are needed. See [Python support](python.md) for source roots, third-party
+import declarations, and scanning without creating configuration.
+
 ## Try the included example
 
 Run `npm run demo`. The UI imports storage directly, violating `ui-must-use-service`. Inspect `examples/boundary-demo/src/ui/orders.ts` and its `.assurance/config.json`.

@@ -128,7 +128,7 @@ async function main(): Promise<number> {
   const output = args.values.format === 'json' ? `${JSON.stringify(report, null, 2)}\n` : args.values.format === 'sarif' ? `${JSON.stringify(sarifReport(report), null, 2)}\n` : textReport(report);
   if (args.values.output) replaceReport(args.values.output, output);
   else process.stdout.write(output);
-  if (command === 'doctor' && args.values.format === 'text') process.stdout.write(`\nRuntime: Node ${process.versions.node}; compiler ${report.tool.typescript}\nConfig: ${readOptional(root, CONFIG_PATH) === undefined ? 'defaults (run init to configure enforcement)' : CONFIG_PATH}\nNetwork/API key: not required for analysis\n`);
+  if (command === 'doctor' && args.values.format === 'text') process.stdout.write(`\nRuntime: Node ${process.versions.node}; TypeScript ${report.tool.typescript}; Python parser ${report.tool.python ?? 'not used or unavailable (see diagnostics)'}\nConfig: ${readOptional(root, CONFIG_PATH) === undefined ? 'defaults (run setup to configure checks)' : CONFIG_PATH}\nNetwork/API key: not required for analysis\n`);
   return report.exitCode;
 }
 

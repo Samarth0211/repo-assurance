@@ -8,7 +8,15 @@ Dependency installation uses npm and needs registry access. The resolver can con
 
 ## Execution
 
-The CLI invokes Git for read-only inventory, revision, and status operations. Arguments are passed without a shell; Git filesystem-monitor execution is disabled. It does not invoke package scripts, TypeScript plugins, application builds, tests, or code generators in the target repository.
+The CLI invokes Git for read-only inventory, revision, and status operations. Arguments are passed without a shell; Git filesystem-monitor execution and optional index refresh locks are disabled. It does not invoke package scripts, TypeScript plugins, application builds, tests, or code generators in the target repository.
+
+For Python files it also launches the bundled AST helper through a trusted interpreter
+outside the target, without a shell, using `-I -S -B`. Source text is passed as JSON;
+target modules, PYTHONPATH, sitecustomize, .pth files, and packaging hooks are not loaded.
+Only the operator environment can select an explicit interpreter; repository policy
+cannot select a program to execute. Python itself remains trusted executable code.
+The helper has batch time/output limits, but OS isolation is still needed for hostile
+inputs. See [Python analysis](python.md) for interpreter selection and encoding limits.
 
 Node.js, the compiler, Git, and parsers remain part of the trusted computing base. A local process is not a sandbox. For hostile repositories, use an isolated environment with controlled filesystem/network access and OS resource limits.
 

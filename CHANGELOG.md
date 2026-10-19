@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.0-alpha.3 - 2026-10-19
+
+- Added Python `.py` discovery, isolated standard-library AST parsing, absolute/relative imports, local source roots, regular/namespace packages, and initializer dependencies.
+- Connected Python and mixed-language scans to the existing boundaries, cycles, baselines, reports, and trusted-base checks.
+- Added explicit third-party imports, dynamic/wildcard/path-hook diagnostics, parser availability/encoding diagnostics, and recorded Python runtime identity.
+- Added Python onboarding prompts, a runnable example, packaged-helper validation, and Python 3.10/3.13 CI coverage.
+- Excluded common Python environment/cache folders and disabled Git optional locks during analysis.
+- Generated GitHub pilots provision Python and use an engine revision with Python support.
+
+Python 3.10+ is required only when Python source is analyzed. Application modules and
+packaging hooks are never imported or executed. Adding Python source roots to policy
+identity invalidates earlier baselines for explicit review; no automatic acceptance occurs.
+See the Python guide for conservative resolution, unsupported runtime behavior, and scope.
+
 ## 0.1.0-alpha.2 - 2026-10-17
 
 - Added `setup` and `npm run onboard` for guided terminal onboarding.

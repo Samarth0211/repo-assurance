@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 
 export function git(root: string, args: string[]): string {
-  return execFileSync('git', ['--no-pager', '-c', 'core.fsmonitor=false', '-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024, timeout: 30_000 });
+  return execFileSync('git', ['--no-optional-locks', '--no-pager', '-c', 'core.fsmonitor=false', '-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024, timeout: 30_000 });
 }
 
 export function gitState(root: string): { head?: string; dirty?: boolean } {

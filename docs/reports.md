@@ -21,7 +21,7 @@ Never convert an exit 2 into success in a mandatory CI gate. SARIF upload succes
 
 `schemaVersion` is 1. Public TypeScript types are exported from the package. Alpha schemas may evolve with documented version changes.
 
-- `tool`: analyzer and compiler versions.
+- `tool`: analyzer and TypeScript versions, plus optional `python` parser version when Python was used.
 - `mode`, `result`, `exitCode`: policy execution outcome.
 - `snapshot`: source content, policy and analysis hashes; Git head/base and dirty state where available.
 - `scope`: discovered/analyzed counts, bytes, dependencies, excluded targets, completeness.
@@ -33,7 +33,7 @@ Never convert an exit 2 into success in a mandatory CI gate. SARIF upload succes
 - `baseline`: accepted count, matched count, and resolved fingerprints requiring retirement.
 - `limitations`: important scope constraints included with every report.
 
-The content hash covers included source. The policy hash covers scope, externals, and rules. The analysis hash also includes the compiler/analyzer version, consulted filesystem inputs, configuration, baseline, and Git candidate identities. Hashes identify evidence; they are not signatures or proof of who ran the analyzer.
+The content hash covers included source. The policy hash covers scope, externals, Python source roots, and rules. The analysis hash also includes compiler/analyzer/Python parser versions, consulted filesystem inputs and helper contents, configuration, baseline, and Git candidate identities. Hashes identify evidence; they are not signatures or proof of who ran the analyzer.
 
 ## Output files
 

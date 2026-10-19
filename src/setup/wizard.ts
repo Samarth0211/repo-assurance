@@ -66,13 +66,32 @@ export async function runSetup(options: SetupOptions, ui: SetupUI): Promise<numb
   const config = existingText === undefined ? defaultConfig() : parseConfig(existingText);
   ui.write(`\nProject: ${display(root)}\nInspecting supported source files...\n`);
   const project = inspectProject(root, config);
-  if (!project.paths.length) throw new Error('No TypeScript or JavaScript source was found in the selected scope. Check the folder, Git ignore rules, and existing include/exclude settings. No setup files were written; other languages are not supported yet.');
+  if (!project.paths.length) throw new Error('No TypeScript, JavaScript, or Python source was found in the selected scope. Check the folder, Git ignore rules, and existing include/exclude settings. No setup files were written; other languages are not supported yet.');
   ui.write(`Found ${project.paths.length} ${project.languages.join('/')} source file(s).\n`);
   if (project.frameworks.length) ui.write(`Recognized packages: ${project.frameworks.join(', ')}.\n`);
+  if (project.languages.includes('Python')) ui.write('Python analysis needs Python 3.10+ on PATH. It reads imports without running your code. Third-party import names must be reviewed and declared in externals.\n');
   for (const note of project.notes.slice(0, 3)) ui.write(`Note: ${display(note)}\n`);
   if (existingText !== undefined) {
     ui.write(`Existing ${CONFIG_PATH} found. Its scope, rules, and ${config.mode === 'observe' ? 'observation' : 'enforcement'} mode will be kept unchanged.\n`);
   } else {
+    if (!options.yes && project.languages.includes('Python')) {
+      while (true) {
+        const answer = await ui.ask('\nPython import source folders, separated by commas [., src]: ');
+        if (!answer) break;
+        try {
+          const checked = parseConfig(JSON.stringify({ ...config, python: { sourceRoots: answer.split(',').map(s => s.trim()) } }));
+          config.python = checked.python;
+          break;
+        } catch { ui.write('Enter repository-relative folders separated by commas; use . for the project root.\n'); }
+      }
+      while (true) {
+        const answer = await ui.ask('Third-party Python import names (for example requests, django); leave blank to review unresolved imports: ');
+        if (!answer) break;
+        const names = [...new Set(answer.split(',').map(s => s.trim()))];
+        if (names.length <= 200 && names.every(name => /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name))) { config.externals = names; break; }
+        ui.write('Enter top-level import names separated by commas, without versions, wildcards, or installation commands.\n');
+      }
+    }
     if (!options.yes && project.scopes.length) {
       const scopes = project.scopes.slice(0, 20);
       const selected = await choose(ui, 'How much of the project should we inspect?', ['All supported source in this repository (recommended)', ...scopes.map(scope => `${scope.slice(0, -3)} only`)]);
@@ -112,6 +131,7 @@ export async function runSetup(options: SetupOptions, ui: SetupUI): Promise<numb
   for (const file of files) if (validateTarget(root, file.path)) throw new Error(`${file.path} already exists. Run setup again to reuse it.`);
   ui.write(`\nReview your setup\nScope: ${display(config.include.join(', '))}\nMode: ${config.mode === 'observe' ? 'report only' : 'local enforcement'}\nBoundary rules: ${config.rules.boundaries.length}; circular-dependency check: ${config.rules.cycles.enabled ? 'on' : 'off'}\n`);
   for (const file of files) ui.write(`Create: ${file.path}\n`);
+  if (project.languages.includes('Python')) ui.write(`Python source folders: ${display(config.python.sourceRoots.join(', '))}\nDeclared external imports: ${display(config.externals.join(', ') || 'none')}\n`);
   for (const file of preserved) ui.write(`Keep unchanged: ${file}\n`);
   if (github) ui.write(`GitHub: a pilot report, with analyzer pinned to ${PILOT_ENGINE_REVISION.slice(0, 12)}. No GitHub settings are changed.\n`);
   if (!options.yes) {

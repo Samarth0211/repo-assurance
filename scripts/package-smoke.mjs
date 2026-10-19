@@ -31,12 +31,18 @@ try {
   const project = path.join(temp, 'onboarding-target');
   fs.mkdirSync(project);
   fs.writeFileSync(path.join(project, 'hello.ts'), 'export const hello = 1;\n');
+  fs.writeFileSync(path.join(project, 'hello.py'), 'import json\n');
+  assert.ok(fs.existsSync(path.join(packageRoot, 'dist/src/analyzers/python-parser.py')));
   const setup = spawnSync(process.execPath, [cli, 'setup', '--root', project, '--yes', '--github'], { encoding: 'utf8', timeout: 30_000 });
   assert.equal(setup.status, 0, setup.stderr || setup.stdout);
   assert.equal(JSON.parse(fs.readFileSync(path.join(project, '.assurance/config.json'), 'utf8')).mode, 'observe');
   assert.ok(fs.existsSync(path.join(project, '.github/workflows/repo-assurance.yml')));
   assert.ok(fs.existsSync(path.join(project, '.assurance/SETUP.md')));
-  process.stdout.write(`Packed and installed ${artifact.filename}; CLI, API, license, guided setup and expected failing demo verified (${artifact.files.length} packaged files).\n`);
+  assert.match(api.scan({ root: project }).tool.python, /^3\./);
+  const pythonDemo = spawnSync(process.execPath, [cli, 'check', '--root', path.join(workspace, 'examples/python-demo')], { encoding: 'utf8', timeout: 30_000 });
+  assert.equal(pythonDemo.status, 1, pythonDemo.stderr || pythonDemo.stdout);
+  assert.match(pythonDemo.stdout, /ui-must-use-service/);
+  process.stdout.write(`Packed and installed ${artifact.filename}; CLI, API, license, Python helper, guided setup and both failing demos verified (${artifact.files.length} packaged files).\n`);
 } finally {
   const resolved = fs.realpathSync(temp);
   assert.equal(path.dirname(resolved), fs.realpathSync(os.tmpdir()));

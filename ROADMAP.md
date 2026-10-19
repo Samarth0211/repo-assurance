@@ -4,7 +4,7 @@ The [implementation plan](IMPLEMENTATION_PLAN.md) contains the complete design. 
 
 ## Working alpha
 
-- Local TS/JS module discovery and resolution.
+- Local TS/JS/Python module discovery and resolution, with an isolated Python AST helper.
 - Direct dependency boundaries and included-source cycles.
 - Explicit incomplete-analysis outcomes and source/policy identity.
 - Existing-finding baselines and resolved-exemption retirement.

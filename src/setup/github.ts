@@ -1,5 +1,5 @@
 // A reviewed, published analyzer revision; update explicitly after validating a new engine.
-export const PILOT_ENGINE_REVISION = 'e88b59c94bca0eab5a06e01b91e16afc88ca3038';
+export const PILOT_ENGINE_REVISION = 'b03930c3d61029f7796eedab1bfe2bbb6d359e73';
 export const WORKFLOW_PATH = '.github/workflows/repo-assurance.yml';
 export const GUIDE_PATH = '.assurance/SETUP.md';
 
@@ -36,6 +36,11 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
+      - name: Set up Python
+        # Python is used only to parse Python source, never to import the project.
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.13'
       - name: Install the analyzer
         working-directory: assurance-tool
         run: npm ci --ignore-scripts
@@ -43,8 +48,8 @@ jobs:
         working-directory: assurance-tool
         run: npm run build
       # Target dependencies are deliberately not installed or executed here.
-      # Missing dependencies produce INCONCLUSIVE; prepare them through a reviewed,
-      # isolated process before adopting this workflow for a real application.
+      # JS/TS dependencies need a reviewed isolated preparation step. Python third-party
+      # imports need explicit externals; Python packages are never imported or installed.
       - name: Inspect architecture
         run: node assurance-tool/dist/src/cli.js scan --root candidate
 `;
@@ -88,8 +93,9 @@ also run it from GitHub's Actions tab. Read the "Inspect architecture" log.
 
 The generated template pins analyzer revision \`${PILOT_ENGINE_REVISION}\`.
 It uses GitHub-hosted runners and a read-only token, and installs only the analyzer.
-It does not install project dependencies. Missing packages require a reviewed,
-isolated dependency preparation step; unresolved analysis is reported explicitly.
+It does not install project dependencies. JS/TS missing packages require a reviewed,
+isolated preparation step. Python third-party import names need explicit externals;
+Python packages are never imported or installed. Unresolved analysis is reported explicitly.
 Your existing workflow, if any, has been kept unchanged and may differ from this template.
 
 ## Before blocking merges

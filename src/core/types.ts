@@ -1,4 +1,4 @@
-export const VERSION = '0.1.0-alpha.2';
+export const VERSION = '0.1.0-alpha.3';
 
 export type Severity = 'error' | 'warning';
 export type Diagnostic = { code: string; message: string; path?: string };
@@ -32,7 +32,7 @@ export type Question = {
 };
 export type Report = {
   schemaVersion: 1;
-  tool: { name: string; version: string; typescript: string };
+  tool: { name: string; version: string; typescript: string; python?: string };
   mode: 'observe' | 'enforce';
   result: 'PASS' | 'FAIL' | 'INCONCLUSIVE';
   exitCode: 0 | 1 | 2;

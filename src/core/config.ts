@@ -6,9 +6,10 @@ import { inside } from './paths.js';
 
 export const CONFIG_PATH = '.assurance/config.json';
 export const BASELINE_PATH = '.assurance/baseline.json';
-export const ALWAYS_EXCLUDED = ['**/.git/**', '**/node_modules/**', '**/.assurance-cache/**'];
+export const ALWAYS_EXCLUDED = ['**/.git/**', '**/node_modules/**', '**/.assurance-cache/**', '**/.venv/**', '**/venv/**', '**/__pycache__/**', '**/site-packages/**', '**/.tox/**', '**/.nox/**'];
 const glob = z.string().min(1).max(512).refine(v => !v.includes('\\') && !v.startsWith('/') && !v.split('/').includes('..'), 'Use a relative forward-slash glob without parent traversal.');
 const severity = z.enum(['error', 'warning']);
+const sourceRoot = z.string().min(1).max(512).refine(v => v === '.' || (!v.includes('\\') && !v.startsWith('/') && !/[:*?\[\]{}!]/.test(v) && !v.split('/').some(p => p === '..' || p === '' || p === '.')), 'Use a relative directory with forward slashes, or a single dot for the repository root.');
 export const configSchema = z.strictObject({
   $schema: z.string().max(2000).optional(),
   schemaVersion: z.literal(1),
@@ -16,6 +17,9 @@ export const configSchema = z.strictObject({
   include: z.array(glob).min(1).max(100).default(['**/*']),
   exclude: z.array(glob).max(100).default(['**/dist/**', '**/build/**', '**/coverage/**', '**/.next/**']),
   externals: z.array(z.string().min(1).max(512)).max(200).default([]),
+  python: z.strictObject({
+    sourceRoots: z.array(sourceRoot).min(1).max(100).default(['.', 'src'])
+  }).default(() => ({ sourceRoots: ['.', 'src'] })),
   analysis: z.strictObject({
     maxFiles: z.number().int().min(1).max(1_000_000).default(50_000),
     maxFileBytes: z.number().int().min(1).max(20_000_000).default(2_000_000)
@@ -65,7 +69,7 @@ export function parseBaseline(text: string): Baseline {
 
 export function defaultConfig(): Config { return configSchema.parse({ schemaVersion: 1 }); }
 export function policyHash(config: Config): string {
-  return digest({ include: config.include, exclude: config.exclude, externals: config.externals, rules: config.rules });
+  return digest({ include: config.include, exclude: config.exclude, externals: config.externals, python: config.python, rules: config.rules });
 }
 
 export function readOptional(root: string, file: string): string | undefined {

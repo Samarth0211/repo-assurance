@@ -2,13 +2,16 @@
 
 **Understand dependency boundaries. Block verified regressions. Keep the evidence.**
 
-Repo Assurance is a local CLI for inspecting TypeScript and JavaScript repositories. It resolves module dependencies, checks architectural boundaries and cycles, and distinguishes existing debt from new violations. Reports include source locations, dependency paths, analysis coverage, and hashes of the inputs used.
+Repo Assurance is a local CLI for inspecting TypeScript, JavaScript, and Python repositories. It resolves module dependencies, checks architectural boundaries and cycles, and distinguishes existing debt from new violations. Reports include source locations, dependency paths, analysis coverage, and hashes of the inputs used.
 
-**Status: `0.1.0-alpha.2`.** This is the first working component of the [larger platform plan](IMPLEMENTATION_PLAN.md). It is suitable for evaluation and narrowly scoped architecture checks. Million-line performance, automatic repairs, complete dead-code detection, and an organization dashboard are future milestones. See the [capability matrix](docs/capabilities.md) before choosing enforcement rules.
+**Status: `0.1.0-alpha.3`.** This is the first working component of the [larger platform plan](IMPLEMENTATION_PLAN.md). It is suitable for evaluation and narrowly scoped architecture checks. Million-line performance, automatic repairs, complete dead-code detection, and an organization dashboard are future milestones. See the [capability matrix](docs/capabilities.md) before choosing enforcement rules.
 
 ## Quick start
 
 Requirements: **Node.js 22.14 or later** and npm. Git is needed to clone the project and use revision-aware checks. No API key, account, model, or database is required.
+
+For Python source, also install **Python 3.10+** on PATH. No pip packages are needed.
+Python analysis parses source without running your application. See the [Python guide](docs/python.md) for source roots and explicit third-party imports.
 
 ```sh
 git clone https://github.com/samarth0211/repo-assurance.git
@@ -28,6 +31,9 @@ npm run onboard -- --root /path/to/your-repository
 On Windows, use a quoted path such as `"C:\work\your-repository"`. Existing configuration, baselines, and workflow files are preserved. See the [wizard walkthrough](docs/guided-setup.md) for choices, unattended setup, and GitHub limits.
 
 For a quick demonstration without onboarding your project, run `npm run demo`. The example intentionally contains one forbidden import. It reports `FAIL` in observation mode and exits successfully so you can inspect the evidence.
+
+Run `npm run demo:python` for the Python version. To inspect an existing repository
+without creating setup files, use `node dist/src/cli.js scan --root /path/to/project`.
 
 ## Define one boundary
 
@@ -62,6 +68,7 @@ node dist/src/cli.js check --root /path/to/your-repository
 
 - Interactive setup with project detection, reviewed rule suggestions, a first report, and optional GitHub pilot generation.
 - TypeScript/JavaScript module resolution using a pinned TypeScript compiler API.
+- Python AST imports, local package/source-root resolution, namespace packages, and mixed-language scans.
 - Direct dependency boundaries, including type imports and declared external modules.
 - Dependency cycles within included source, with optional type-only cycle detection.
 - Git-aware discovery, explicit exclusions, source budgets, and content fingerprints.
@@ -92,6 +99,7 @@ All commands accept `--root`. `setup --yes` uses unattended observation defaults
 | Need | Guide |
 |---|---|
 | Set up interactively without editing JSON | [Guided setup](docs/guided-setup.md) |
+| Analyze Python without running application code | [Python support](docs/python.md) |
 | Install and onboard an existing repository | [Getting started](docs/getting-started.md) |
 | Understand all policy fields and defaults | [Configuration reference](docs/configuration.md) |
 | Read findings, hashes, and exit codes | [Reports and API](docs/reports.md) |

@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 import { analyzeTypeScript } from '../analyzers/typescript.js';
+import { analyzePython } from '../analyzers/python.js';
 import { evaluate } from '../policies/evaluate.js';
 import { BASELINE_PATH, CONFIG_PATH, defaultConfig, parseBaseline, parseConfig, policyHash, readOptional } from './config.js';
-import { discover, inventory } from './discovery.js';
+import { discover, inventory, isPython } from './discovery.js';
 import { git, gitFile, gitState, resolveCommit } from './git.js';
 import { digest } from './hash.js';
 import { TrackedIO } from './io.js';
@@ -51,7 +52,9 @@ export function scan(options: ScanOptions = {}): Report {
     const tracked = new Set(git(root, ['ls-files', '--cached', '-z']).split('\0'));
     for (const file of found.paths) if (!tracked.has(file)) diagnostics.push({ code: 'UNTRACKED_SOURCE', path: file, message: 'Candidate analysis includes untracked source; commit or exclude it before integration verification.' });
   }
-  const analyzed = analyzeTypeScript(root, found.files, config, io);
+  const typescript = analyzeTypeScript(root, found.files.filter(f => !isPython(f.path)), config, io);
+  const python = analyzePython(root, found.files.filter(f => isPython(f.path)), config, io);
+  const analyzed = { edges: [...typescript.edges, ...python.edges].sort((a, b) => a.from.localeCompare(b.from, 'en') || a.to.localeCompare(b.to, 'en') || a.line - b.line || a.column - b.column), diagnostics: [...typescript.diagnostics, ...python.diagnostics], analyzed: typescript.analyzed + python.analyzed };
   diagnostics.push(...analyzed.diagnostics);
   const findings = evaluate(found.files.map(f => f.path), analyzed.edges, config);
   const policy = policyHash(config);
@@ -78,12 +81,12 @@ export function scan(options: ScanOptions = {}): Report {
   const contentHash = digest(found.files.map(({ path: filePath, hash, bytes }) => ({ path: filePath, hash, bytes })));
   const report: Report = {
     schemaVersion: 1,
-    tool: { name: 'repo-assurance', version: VERSION, typescript: ts.version },
+    tool: { name: 'repo-assurance', version: VERSION, typescript: ts.version, ...(python.version ? { python: python.version } : {}) },
     mode, result,
     exitCode: result === 'INCONCLUSIVE' ? 2 : mode === 'enforce' && result === 'FAIL' ? 1 : 0,
     snapshot: {
       contentHash, policyHash: policy,
-      analysisHash: digest({ version: VERSION, typescript: ts.version, config, inputs: io.fingerprint(), baseline, base, head: startGit.head }),
+      analysisHash: digest({ version: VERSION, typescript: ts.version, python: python.version, config, inputs: io.fingerprint(), baseline, base, head: startGit.head }),
       gitHead: startGit.head, gitBase: base, dirty: startGit.dirty
     },
     scope: {
@@ -95,9 +98,9 @@ export function scan(options: ScanOptions = {}): Report {
     },
     files: found.files.map(({ path: filePath, hash, bytes }) => ({ path: filePath, hash, bytes })),
     edges: analyzed.edges, findings, diagnostics: uniqueDiagnostics,
-    questions: uniqueDiagnostics.filter(d => ['UNRESOLVED_IMPORT', 'DYNAMIC_IMPORT', 'NO_BLOCKING_RULES'].includes(d.code)).map(d => ({
+    questions: uniqueDiagnostics.filter(d => ['UNRESOLVED_IMPORT', 'PYTHON_IMPORT_UNRESOLVED', 'PYTHON_IMPORT_PATH', 'DYNAMIC_IMPORT', 'NO_BLOCKING_RULES'].includes(d.code)).map(d => ({
       id: digest(d).slice(0, 16), code: d.code, path: d.path,
-      question: d.code === 'NO_BLOCKING_RULES' ? 'Which dependency boundaries or cycles should block changes in this project?' : 'Is this dependency supported by the current compiler configuration, or is it a deliberate external/dynamic dependency?',
+      question: d.code === 'NO_BLOCKING_RULES' ? 'Which dependency boundaries or cycles should block changes in this project?' : d.code.startsWith('PYTHON_') ? 'Which Python source root or explicitly declared third-party module should provide this dependency?' : 'Is this dependency supported by the current compiler configuration, or is it a deliberate external/dynamic dependency?',
       reason: d.message
     })),
     baseline: { active: baseline?.entries.length ?? 0, matched: findings.filter(f => f.status === 'existing').length, resolved },
@@ -105,6 +108,7 @@ export function scan(options: ScanOptions = {}): Report {
       'Module dependency analysis only; no whole-program call/data-flow, dead-code proof, type-checking, security certification, or scalability proof.',
       'Cycles are checked only among included resolved source files; external dependencies and excluded targets are not traversed.',
       'TypeScript 6.0.3 parsing/resolution; custom bundler loaders, framework-generated entry points, and non-literal imports require explicit handling.',
+      'Python uses an isolated Python 3.10+ AST helper; static local imports, source roots, and package initialization are modeled. Third-party modules require explicit externals; runtime hooks, attribute binding and conditional execution are not fully modeled.',
       'A local check does not configure branch protection or prevent hosting administrators from bypassing it.'
     ]
   };

@@ -9,6 +9,7 @@ The default path is `.assurance/config.json` in the analyzed repository. Unknown
 | `include` | `["**/*"]` | Repository-relative source globs |
 | `exclude` | dist, build, coverage, .next directories | Additional source exclusions |
 | `externals` | `[]` | Module specifiers deliberately treated as external |
+| `python.sourceRoots` | `[".", "src"]` | Python import lookup directories relative to the repository; not globs |
 | `analysis.maxFiles` | `50000` | Maximum source files parsed; excess is inconclusive |
 | `analysis.maxFileBytes` | `2000000` | Per-source size limit; excess is inconclusive |
 | `rules.boundaries` | `[]` | Direct dependency restrictions |
@@ -16,13 +17,13 @@ The default path is `.assurance/config.json` in the analyzed repository. Unknown
 | `rules.cycles.severity` | `warning` | `warning` or `error` |
 | `rules.cycles.includeTypeOnly` | `false` | Include type-only edges in cycle detection |
 
-`.git`, `node_modules`, and `.assurance-cache` are always excluded from source traversal. Dependencies in `node_modules` can still be consulted by module resolution. These exclusions do not mean the resolver never reads package metadata or declaration paths there.
+`.git`, `node_modules`, `.assurance-cache`, `.venv`, `venv`, `__pycache__`, `site-packages`, `.tox`, and `.nox` are always excluded from source traversal. JS/TS dependencies in `node_modules` can still be consulted by module resolution. Python third-party modules are declared as opaque externals and are never imported or inspected from site-packages.
 
 ## Patterns and scope
 
 Use forward slashes on every operating system. Patterns are case-sensitive and use minimatch syntax, including `**` and braces. Negated/comment patterns are not supported; use `include` and `exclude`. Parent traversal and absolute glob paths are rejected.
 
-Supported source suffixes: `.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`, including declaration files matching those suffixes. JSON and other assets may be resolved targets, but are not parsed as source.
+Supported source suffixes: `.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`, including declaration files matching those suffixes, and UTF-8 Python `.py`. Python `.pyi`/`.pyw` and notebooks are outside coverage. JSON and other assets may be resolved TS/JS targets, but are not parsed as source.
 
 In Git repositories, the inventory includes tracked files and non-ignored untracked files. Tracked files remain in scope even when they match `.gitignore`; explicit assurance exclusions still apply. Without Git, the directory walker uses assurance exclusions, not `.gitignore`.
 
@@ -52,10 +53,15 @@ This does not invoke `tsc --build` or promise solution-wide project-reference se
 
 ## Deliberate externals
 
+For Python, declare third-party import roots such as `requests` or `django`, including
+their dotted imports. Local Python modules are resolved before explicit externals.
+Source roots and Python resolution limits are described in the [Python guide](python.md).
+The same externals array also applies to JS/TS; review declarations in mixed repositories.
+
 An asset import such as `import './theme.css'` may require `"externals": ["**/*.css"]`. This explicitly models the import as an opaque external dependency. Do not add `"**"` just to suppress unresolved imports; it would remove the internal graph you intended to analyze. Treat external declarations and exclusions as reviewable policy changes.
 
 ## Observation versus enforcement
 
 `scan` follows the configured mode. `check` forces enforcement without editing configuration. Observation returns zero for verified findings but still returns two for incomplete analysis. Enforcement requires an actual configuration and at least one error-level rule, avoiding a misleading empty gate.
 
-Changing mode does not invalidate a baseline. Changing rules, scope, or externals does. A base-aware check reads policy and baseline from the selected base revision and rejects changes to those protected files pending a separate authorized update process.
+Changing mode does not invalidate a baseline. Changing rules, scope, externals, or Python source roots does. Alpha.3 extends policy identity with Python settings, so earlier baselines require reviewed revalidation. A base-aware check reads policy and baseline from the selected base revision and rejects changes to those protected files pending a separate authorized update process.

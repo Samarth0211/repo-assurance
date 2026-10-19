@@ -1,14 +1,18 @@
 # Capabilities and limitations
 
-This document describes `0.1.0-alpha.2`, not the complete planned platform.
+This document describes `0.1.0-alpha.3`, not the complete planned platform.
 
 | Capability | Status | Boundary |
 |---|---|---|
 | Local CLI and programmatic API | Implemented | Node.js 22.14+ |
-| Guided terminal setup | Implemented | JS/TS detection, reviewed suggestions, first scan; existing files preserved |
+| Guided terminal setup | Implemented | JS/TS/Python detection, reviewed suggestions, first scan; existing files preserved |
 | GitHub pilot generation | Implemented | Separate pinned analyzer; owner must configure trusted enforcement |
 | Browser setup UI | Not implemented | Use the terminal wizard |
 | TS/JS source discovery | Implemented | Supported suffixes and explicit scope |
+| Python source discovery and AST imports | Implemented | UTF-8 `.py`; trusted Python 3.10+ interpreter required |
+| Python package resolution | Implemented | Local source roots, relative imports, initializers, and namespace packages |
+| Python third-party imports | Explicit opaque externals | No target package loading or automatic distribution-to-import mapping |
+| Mixed JS/TS/Python scans | Implemented | Shared boundary/cycle engine; no cross-language runtime/FFI proof |
 | Compiler-aware module resolution | Implemented | TypeScript 6.0.3 API and supported configuration |
 | Static imports/reexports/import-equals | Implemented | Literal specifiers |
 | Literal dynamic import and `require()` | Implemented | Computed specifiers produce inconclusive |
@@ -27,9 +31,13 @@ This document describes `0.1.0-alpha.2`, not the complete planned platform.
 | Automated repairs | Planned | Source is not rewritten |
 | Expiring exceptions/RBAC/dashboard | Planned | Existing organization governance is required |
 | GitHub merge queue or App service | Integration guidance only | No hosted service or custom queue |
-| Languages beyond TS/JS | Planned | Unsupported files are not analyzed |
+| Languages beyond TS/JS/Python | Planned | Unsupported files are not analyzed |
 
 ## Analysis assumptions
+
+Python uses a bundled isolated AST helper and a static source-root resolver. See the
+[Python guide](python.md) for initialization edges, conditional imports, opaque externals,
+wildcards/dynamic-code diagnostics, and unresolved runtime behavior.
 
 `require()` is recognized syntactically. Exotic loaders, aliases for module-loading functions, reflection, plugin registration, runtime-generated code, bundler transforms, and non-module resource loading are not complete analysis targets. A module graph is not a whole-program execution graph.
 

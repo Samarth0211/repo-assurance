@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "mode": "observe",
+  "include": ["src/**"],
+  "python": { "sourceRoots": ["src"] },
+  "rules": {
+    "boundaries": [{
+      "id": "ui-must-use-service",
+      "from": ["src/shop/ui/**"],
+      "disallow": ["src/shop/storage/**"],
+      "severity": "error",
+      "message": "The UI must use the service interface instead of importing storage directly."
+    }],
+    "cycles": { "enabled": true, "severity": "error" }
+  }
+}
