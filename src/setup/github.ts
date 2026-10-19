@@ -1,5 +1,5 @@
 // A reviewed, published analyzer revision; update explicitly after validating a new engine.
-export const PILOT_ENGINE_REVISION = 'e88b59c94bca0eab5a06e01b91e16afc88ca3038';
+export const PILOT_ENGINE_REVISION = 'b03930c3d61029f7796eedab1bfe2bbb6d359e73';
 export const WORKFLOW_PATH = '.github/workflows/repo-assurance.yml';
 export const GUIDE_PATH = '.assurance/SETUP.md';
 
