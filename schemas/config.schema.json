@@ -56,6 +56,32 @@
         "maxLength": 512
       }
     },
+    "python": {
+      "default": {
+        "sourceRoots": [
+          ".",
+          "src"
+        ]
+      },
+      "type": "object",
+      "properties": {
+        "sourceRoots": {
+          "default": [
+            ".",
+            "src"
+          ],
+          "minItems": 1,
+          "maxItems": 100,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        }
+      },
+      "additionalProperties": false
+    },
     "analysis": {
       "default": {
         "maxFiles": 50000,

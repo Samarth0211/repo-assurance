@@ -5,7 +5,7 @@ It runs in your terminal. There is no browser dashboard or hosted account to cre
 
 ## Start
 
-With Node.js 22.14+ and Git installed:
+With Node.js 22.14+ and Git installed (plus Python 3.10+ for Python projects):
 
 ```sh
 git clone https://github.com/Samarth0211/repo-assurance.git
@@ -30,7 +30,9 @@ With a global local installation, use `repo-assurance setup` from your project.
 ## What the wizard asks
 
 1. **Project folder.** Enter or paste a folder path. Quoted paths and `~/` work.
-   A mistyped path can be corrected. Setup requires some supported JS/TS source.
+   A mistyped path can be corrected. Setup requires some supported JS/TS/Python source.
+   Python projects also get prompts for import source folders and reviewed third-party
+   import names. The wizard does not install or import Python packages.
 2. **Scope, when applicable.** Repositories with `apps/` or `packages/` offer a
    choice between all supported source and one detected package. All is the default.
 3. **Suggested boundaries.** Where sibling UI and storage folders exist, the wizard
@@ -85,7 +87,8 @@ node dist/src/cli.js setup --root "../my-shop" --yes --github
 ```
 
 For a new project, `--yes` selects all supported source, observation mode, cycle
-checks, and no guessed boundaries. GitHub output requires `--github`. Existing
+checks, default Python source roots, and no guessed boundaries or external declarations.
+Unresolved Python third-party imports remain inconclusive. GitHub output requires `--github`. Existing
 policy is still preserved. Unattended setup does not accept existing violations.
 
 ## GitHub pilot and merge protection
@@ -93,6 +96,7 @@ policy is still preserved. Unattended setup does not accept existing violations.
 The generated workflow runs on pull requests and can be started manually after it
 reaches the default branch. It uses read-only repository access, a separately
 checked-out analyzer pinned to a published commit, and GitHub-hosted runners.
+The template provisions Python 3.13 for the parser.
 It installs only the analyzer. Project dependency preparation is a separate,
 reviewed integration step; missing packages make analysis inconclusive.
 

@@ -39,7 +39,7 @@ export function inspectProject(root: string, config: Config): Project {
   }
   return {
     paths: found.paths,
-    languages: [found.paths.some(p => /\.[cm]?tsx?$/i.test(p)) ? 'TypeScript' : '', found.paths.some(p => /\.[cm]?jsx?$/i.test(p)) ? 'JavaScript' : ''].filter(Boolean),
+    languages: [found.paths.some(p => /\.[cm]?tsx?$/i.test(p)) ? 'TypeScript' : '', found.paths.some(p => /\.[cm]?jsx?$/i.test(p)) ? 'JavaScript' : '', found.paths.some(p => /\.py$/i.test(p)) ? 'Python' : ''].filter(Boolean),
     frameworks,
     scopes: [...scopes].sort(),
     notes

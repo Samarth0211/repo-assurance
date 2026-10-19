@@ -8,7 +8,8 @@ import { TrackedIO } from './io.js';
 import { inside, relative, slash } from './paths.js';
 import type { Diagnostic, SourceFile } from './types.js';
 
-export const SOURCE_PATTERN = /\.(?:[cm]?[jt]s|[jt]sx)$/i;
+export const SOURCE_PATTERN = /\.(?:[cm]?[jt]s|[jt]sx|py)$/i;
+export const isPython = (file: string): boolean => /\.py$/i.test(file);
 export const matches = (file: string, patterns: string[]): boolean => patterns.some(pattern => minimatch(file, pattern, { dot: true, nocomment: true, nonegate: true }));
 
 export function inventory(root: string, config: Config): { paths: string[]; diagnostics: Diagnostic[] } {
@@ -62,6 +63,10 @@ export function discover(root: string, config: Config, io: TrackedIO): { files: 
       }
       const text = io.read(absolute);
       if (text === undefined) throw new Error('Source is missing.');
+      if (isPython(p) && !Buffer.from(text, 'utf8').equals(fs.readFileSync(absolute))) {
+        found.diagnostics.push({ code: 'PYTHON_ENCODING', path: p, message: 'Python analysis requires UTF-8 source. This file has another encoding or changed while being read.' });
+        continue;
+      }
       if (text.startsWith('version https://git-lfs.github.com/spec/v1')) {
         found.diagnostics.push({ code: 'LFS_POINTER', path: p, message: 'Git LFS source content is not present.' });
         continue;

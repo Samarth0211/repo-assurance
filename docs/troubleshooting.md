@@ -13,6 +13,12 @@
 | `NO_BLOCKING_RULES` | Define an error-level boundary or cycle rule |
 | `NO_SOURCE_FILES` | Check root, include/exclude patterns, and supported suffixes |
 | `UNRESOLVED_IMPORT` | Install target dependencies; verify nearest compiler configuration; explicitly declare real opaque externals |
+| `PYTHON_RUNTIME_UNAVAILABLE` | Install Python 3.10+ outside the target or set an absolute `REPO_ASSURANCE_PYTHON`; rebuild if the packaged helper is missing |
+| `PYTHON_IMPORT_UNRESOLVED` | Review `python.sourceRoots`, package layout, conflicts, and explicit third-party import names |
+| `PYTHON_SOURCE_ROOT` | Choose existing source directories inside the target without escaping symlinks |
+| `PYTHON_ENCODING` | Use UTF-8 Python source; do not treat lossy decoding as analyzed code |
+| `PYTHON_PARSER_FAILED` | Check parser availability/resource limits; the batch was not fully analyzed |
+| `PYTHON_STAR_IMPORT` / `PYTHON_IMPORT_PATH` / `PYTHON_DYNAMIC_CODE` | Review unsupported wildcard loading, path hooks, or evaluated code; do not suppress an incomplete gate |
 | `DYNAMIC_IMPORT` | Review computed module loading; the alpha cannot prove its targets |
 | `COMPILER_CONFIG` | Resolve the reported TypeScript 6.0.3 configuration issue |
 | `SYNTAX_ERROR` | Repair syntax or use a supported parser version |

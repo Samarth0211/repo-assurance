@@ -127,8 +127,8 @@ test('repeat setup preserves existing policy, accepted findings, workflow and no
 });
 
 test('unsupported or empty projects do not receive a misleading setup', async t => {
-  const root = fixture(t, { 'main.py': 'print("hello")' });
-  await assert.rejects(runSetup({ root, yes: true }, scripted()), /No TypeScript or JavaScript/);
+  const root = fixture(t, { 'main.go': 'package main' });
+  await assert.rejects(runSetup({ root, yes: true }, scripted()), /No TypeScript, JavaScript, or Python/);
   assert.equal(exists(root, '.assurance'), false);
 });
 
@@ -247,7 +247,8 @@ test('generated GitHub pilot pins the analyzer separately and never runs target 
   assert.match(workflow, /path: candidate/);
   assert.match(workflow, /path: assurance-tool/);
   assert.equal((workflow.match(/persist-credentials: false/g) ?? []).length, 2);
-  assert.equal((workflow.match(/uses: [^\n]+@[a-f0-9]{40}/g) ?? []).length, 3);
+  assert.equal((workflow.match(/uses: [^\n]+@[a-f0-9]{40}/g) ?? []).length, 4);
+  assert.match(workflow, /python-version: '3.13'/);
   assert.doesNotMatch(workflow, /pull_request_target|secrets\.|continue-on-error|working-directory: candidate/);
   assert.match(read(root, GUIDE_PATH), /not an authoritative merge gate/);
   assert.match(read(root, GUIDE_PATH), /up-to-date branches/);

@@ -1,7 +1,7 @@
 {
   "name": "@samarth0211/repo-assurance",
-  "version": "0.1.0-alpha.2",
-  "description": "Local, evidence-backed architecture checks for TypeScript and JavaScript repositories.",
+  "version": "0.1.0-alpha.3",
+  "description": "Local, evidence-backed architecture checks for TypeScript, JavaScript, and Python repositories.",
   "type": "module",
   "license": "MIT",
   "author": "samarth0211",
@@ -24,14 +24,15 @@
   "scripts": {
     "setup": "npm ci --ignore-scripts && npm run build",
     "onboard": "node dist/src/cli.js setup",
-    "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/test/all.test.js dist/test/setup.test.js",
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "test": "npm run build && node --test dist/test/all.test.js dist/test/setup.test.js dist/test/python.test.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "schemas": "npm run build && node scripts/schemas.mjs",
     "check": "npm test && node dist/src/cli.js check && npm run docs:check",
     "docs:check": "node scripts/check-docs.mjs",
     "test:package": "node scripts/package-smoke.mjs",
     "demo": "npm run build && node dist/src/cli.js scan --root examples/boundary-demo",
+    "demo:python": "npm run build && node dist/src/cli.js scan --root examples/python-demo",
     "prepack": "npm run build"
   },
   "repository": {

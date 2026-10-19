@@ -1,4 +1,8 @@
 node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
 dist/
 coverage/
 .assurance-cache/

@@ -9,6 +9,12 @@ target dependencies. It runs `scan` using candidate policy and is not an authori
 merge gate. Use the trust pattern below before turning findings into merge requirements.
 See [guided setup](guided-setup.md) for the generated files and repeat-run behavior.
 
+Python analysis needs a trusted Python 3.10+ interpreter outside the candidate.
+The generated pilot provisions Python 3.13. Python packages are not installed or
+imported; declare reviewed third-party import names explicitly. Existing pilot
+files are preserved by setup, so their analyzer revision/runtime must be upgraded
+deliberately for Python support. See the [Python guide](python.md).
+
 The repository host must require the check, enforce branch freshness, protect the workflow and policy, and control bypass permissions. Repo Assurance cannot configure or guarantee those properties merely by reading source.
 
 The project's own CI tests its implementation on Linux and Windows. That workflow is not a complete company deployment. In particular, running an analyzer copied from an untrusted PR would let that PR replace the analyzer.

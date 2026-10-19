@@ -6,6 +6,10 @@ The lockfile pins exact packages. Runtime dependencies are TypeScript, Zod, and 
 
 TypeScript provides parsing and module resolution. Zod validates configuration and baseline input. Minimatch evaluates bounded glob patterns. The project does not require a paid scanner, API, or hosted database.
 
+Python analysis also needs a trusted Python 3.10+ interpreter. Its standard-library
+AST parser is used through the bundled helper; no pip dependency or target package
+installation is required. The build copies that helper into the distributable package.
+
 To inspect an installation:
 
 ```sh

@@ -7,7 +7,7 @@ CLI
   -> scan orchestration
        -> validated configuration + Git snapshot + tracked input reads
        -> source discovery
-       -> TypeScript module extraction
+       -> TypeScript module extraction + isolated Python AST extraction
        -> policy evaluation
        -> baseline matching + input consistency validation
        -> structured report
@@ -25,6 +25,12 @@ for each parse so setup sessions cannot share mutable rule lists.
 The initial release uses modules in one package. Extract packages/services only when there is a concrete lifecycle, performance, or ownership reason. The larger [implementation plan](../IMPLEMENTATION_PLAN.md) remains the design direction, not a list of features already present.
 
 ## Snapshot consistency
+
+Python extraction uses a bundled helper receiving source text as JSON. The runtime
+adapter selects a trusted external interpreter and applies process time/output limits;
+the resolver models local source roots and package initialization without loading target
+modules. Both adapters return the same edge/diagnostic model to policy evaluation.
+See [Python analysis](python.md) for its precise scope and conservative cases.
 
 Source bodies and consulted compiler files are hashed. Resolution existence probes are recorded. Source inventory, consulted inputs, Git HEAD, and the selected local base reference are rechecked before the report is returned. A detected change makes analysis inconclusive.
 
